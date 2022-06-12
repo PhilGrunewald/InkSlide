@@ -27,6 +27,8 @@ Use Inkscape (v 1.2+) to edit `slides.svg`.
 
 **Navigation**: At the bottom of the slides is a strip with slide names (if the Inscape page was given a name) or the page number. These highlight which slides have been visited (green) and which slide is currently shown (white border). Click on these to jump directly to any slide.
 
+![Pages with a name show up in the navigation bar. Others are numbered](img/page_name.png)
+
 Presenting
 ----------
 
@@ -37,3 +39,5 @@ Open `index.html` in your browser and switch to full screen. The first slide adv
 Jump directly to a slide by clicking on the navigation bar.
 
 `All` brings up and overview of all slides.
+
+![`All` opens an overview](img/all.png)
