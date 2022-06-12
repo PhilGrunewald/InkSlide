@@ -35,9 +35,11 @@ Use Inkscape (v 1.2+) to edit `slides.svg`.
 Presenting
 ----------
 
-Open `index.html` in your browser and switch to full screen. The first slide advance has to be done by clicking anywhere on the slide. After that, <Space> and <ArrowRight> also advance the slides. 
+Open `index.html` in your browser and switch to full screen. The first slide advance has to be done by clicking anywhere on the slide. 
 
-<ArrowLeft> goes back.
+After that, `<Space>` and `<ArrowRight>` also advance the slides. 
+
+`<ArrowLeft>` goes back.
 
 Jump directly to a slide by clicking on the navigation bar.
 
