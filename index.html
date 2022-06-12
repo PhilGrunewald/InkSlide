@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  body {
+    font-family: 'HelveticaNeue-Light', 'sans-serif';
+    margin:       0px;
+  }
+  #slides {
+    position: absolute;
+    top:           30%;
+    transform: translateY(-30%);
+  }
+  .nav {
+    position: fixed;
+    background-color: #ddd;
+    width:      100%;
+    bottom:      0px;
+    padding:    10px;
+    }
+  .nav-item {
+    display:      inline-block;
+    background-color: #ccc;
+    color:        #fff;
+    border-radius: 4px;
+    padding-left:  5px;
+    padding-right: 5px;
+    margin:        5px;
+    }
+  .visited {
+    background-color: #8c8;
+  }
+  .current {
+    border:       solid;
+    border-width:  2px;
+  }
+  </style>
+</head>
+<body>
+  <object id='slides' type="image/svg+xml" data="slides.svg" width="100%"></object>
+  <div id="nav" class="nav">
+    <span class='nav-item' id='navAll' onclick='overview()'>All</span>
+  </div>
+<script>
+var slide = document.getElementById("slides");   // the html object displaying the svg
+var nav = document.getElementById("nav");        // navigation div at bottom of screen
+var svgDoc;                                      // content of svg file
+var svg;                                         // the svg part of the document
+
+var width  = 508;                                // standard 1080p
+var height = 285.75;
+var extent_x =0;                                  // for overview
+var extent_y =0;
+
+var pages;                                       // contains the position of the pages in svg
+var page = 0;
+var level = 0;
+
+slide.addEventListener("load",function(){
+    svgDoc = slide.contentDocument;
+    svg   = svgDoc.getElementById('svgSlides')
+    pages = svgDoc.getElementsByTagName('inkscape:page')
+
+    // page ordering by xy position
+    var xy = new Array();
+    for (let p = 0; p < pages.length; p++) {
+        var x = pages[p].getAttribute('x');
+        var y = pages[p].getAttribute('y');
+        extent_x = Math.max(extent_x,x);
+        extent_y = Math.max(extent_y,y);
+        xy[p] = parseInt(x) + parseInt(width*20*y);
+        }
+    var rank = [...xy].sort(function (a,b) {return a-b;});
+    var pageOrder = new Array();
+    for (let p = 0; p < xy.length; p++) {
+        pageOrder[rank.indexOf(xy[p])] = p;
+        }
+
+    // navigation bar
+    for (let p = 0; p < pageOrder.length; p++) {
+        var pNav  = document.createElement('span');
+        var title = pages[pageOrder[p]].getAttribute('inkscape:label');
+        if (title) {
+            pNav.innerHTML = title;
+        } else {
+            pNav.innerHTML = p+1;
+        }
+        pNav.id = `nav${p}`;
+        pNav.className = 'nav-item';
+        pNav.setAttribute("onclick",`page=${p};moveTo(${pageOrder[p]})`);
+        nav.appendChild(pNav);
+        var navSpacer  = document.createElement('span');
+        navSpacer.innerHTML = " ";
+        nav.appendChild(navSpacer);
+        }
+    moveTo(pageOrder[page]);
+
+    // next/appear
+    svgDoc.addEventListener("mousedown",function(){ advance() }, false);
+    svgDoc.addEventListener("keydown",function(e){ 
+        if (e.key == 'ArrowLeft') {
+            if (level > 1) {
+               var noShow = svgDoc.getElementsByClassName(`show${level-1}`);
+               for (let i = 0; i < noShow.length; i++) {
+                   noShow[i].setAttribute("visibility","hidden");
+               }
+               level -= 2;
+              }
+           else if (page > 0) {
+                page -=2;
+                level = 0;
+              }
+            advance();
+          }
+        if (e.key == 'ArrowRight') { advance(); }
+        if (e.key == ' ') { advance(); }
+        }, false);
+
+
+    function advance() {
+       var hide = svgDoc.getElementsByClassName(`hide${level}`);
+       for (let i = 0; i < hide.length; i++) {
+           hide[i].setAttribute("visibility","hidden");
+       }
+       var show = svgDoc.getElementsByClassName(`show${level}`);
+       var showOnSlide = new Array();
+       for (let i = 0; i < show.length; i++) {
+           var e = show[i].getBoundingClientRect();
+             if ((e.x > 0) && (e.x < window.innerWidth) && (e.y > 0) && (e.y < (window.innerWidth/width*height))) {
+              // is on slide
+              showOnSlide.push(show[i]);
+             }
+           }
+       for (let i = 0; i < showOnSlide.length; i++) {
+           showOnSlide[i].setAttribute("visibility","visible");
+       }
+       if (showOnSlide.length < 1) {
+          page += 1;
+          moveTo(pageOrder[page]);
+          level = 1;
+       } else {
+          level += 1;
+       }
+    }
+}, false);
+
+function moveTo(p) {
+    // change the viewBox to a new slide
+    level = 1;
+    var x = pages[p].getAttribute('x');
+    var y = pages[p].getAttribute('y');
+    svg.setAttribute('viewBox',[x, y, width, height]);
+
+    // clear 'current' highlight from others
+    var prev = document.getElementsByClassName('nav-item visited current');
+    if (prev.length > 0) { prev[0].className = 'nav-item visited'; }
+
+    // highlight current
+    document.getElementById(`nav${page}`).className = 'nav-item visited current';
+
+    // hide all
+    for (let l = 0; l < 10; l++) {
+        var collection = svgDoc.getElementsByClassName(`show${l}`);
+        for (let i = 0; i < collection.length; i++) {
+          collection[i].setAttribute("visibility","hidden");
+          }
+        }
+}
+
+function overview() {
+    level=10;
+    // clear 'current' highlight from others
+    var prev = document.getElementsByClassName('nav-item visited current');
+    if (prev.length > 0) { prev[0].className = 'nav-item visited'; }
+    document.getElementById('navAll').className = 'nav-item visited current';
+    svg.setAttribute('viewBox',[0, 0, extent_x+width, extent_y+height]);
+  }
+
+</script>
+</body>
