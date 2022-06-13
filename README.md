@@ -6,7 +6,7 @@ Part of my Zero-Microsoft by 2030 pledge.
 The latest release of Inkscape includes pages. This opens the door to using Inkscape to create slides for presentations.
 
 
-![Turn svg pages into slides](img/InkSlide.png)
+![Turn svg pages into slides](img/cover.png)
 
 This repository contains two key files:
 
